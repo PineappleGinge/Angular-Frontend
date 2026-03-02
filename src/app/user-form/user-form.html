@@ -1,0 +1,68 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>User Form</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput id="name" type="text" formControlName="name">
+        <mat-hint>Must be at least 3 chars</mat-hint>
+        <mat-error>
+          @if (!name?.value) {
+            Must be at least 3 chars
+          }
+          @if (name?.hasError('required')) {
+            Name is required
+          }
+          @else if (name?.hasError('minlength')) {
+            Must be at least 3 characters
+          }
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Phone Number</mat-label>
+        <input matInput id="phonenumber" type="tel" formControlName="phonenumber">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput id="email" type="email" formControlName="email">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Date of Birth</mat-label>
+        <input matInput id="dob" type="date" formControlName="dob">
+        <mat-error>
+          @if (dob?.hasError('tooYoung')) {
+            You must be at least 18 years old.
+          }
+          @if (dob?.hasError('invalidDate')) {
+            Must be a valid date.
+          }
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Date Joined</mat-label>
+        <input matInput type="date" formControlName="dateJoined">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Last Updated</mat-label>
+        <input matInput type="date" formControlName="lastUpdated">
+      </mat-form-field>
+
+      <mat-card-actions>
+        <button mat-raised-button color="accent" type="submit" [disabled]="userForm.invalid">
+          Submit
+        </button>
+      </mat-card-actions>
+
+    </form>
+  </mat-card-content>
+</mat-card>
+

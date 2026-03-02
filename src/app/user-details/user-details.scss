@@ -1,0 +1,34 @@
+﻿.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.user-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.user-details app-user-form {
+  width: 60%;
+  max-width: 900px;
+  min-width: 360px;
+}
+
+.user-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .user-details app-user-form {
+    width: 90%;
+    min-width: 0;
+  }
+}

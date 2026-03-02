@@ -1,0 +1,120 @@
+﻿.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px 4px;
+}
+
+.list-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: #6b7280;
+  }
+}
+
+.user-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.user-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.09);
+    border-color: #d1d5db;
+  }
+}
+
+.user-main {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(140deg, #2563eb, #1d4ed8);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.2px;
+}
+
+.user-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-name {
+  font-weight: 700;
+  color: #111827;
+}
+
+.user-id {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.user-footer {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: calc(44px + 12px);
+}
+
+.user-link {
+  color: #0ea5e9;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #e6f9ff;
+  transition: background-color 120ms ease, color 120ms ease;
+
+  &:hover {
+    background: #d0f2ff;
+  }
+}
+
+.loading,
+.empty {
+  padding: 16px;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .user-card {
+    padding: 14px 14px 12px;
+  }
+}

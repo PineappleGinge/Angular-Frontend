@@ -1,0 +1,15 @@
+@if (user$ | async; as user) {
+  <section class="user-details">
+    <h2 class="user-title">{{ user.name }}</h2>
+
+    <app-user-form [user]="user"></app-user-form>
+
+    <div class="user-actions">
+      <button mat-flat-button color="warn" (click)="deleteUser()">
+        Delete
+      </button>
+    </div>
+  </section>
+} @else {
+  Loading user...
+}

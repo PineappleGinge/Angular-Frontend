@@ -1,0 +1,74 @@
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>Car Form</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+        <form [formGroup]="carForm" (ngSubmit)="onSubmit()" class="car-form">
+
+            <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Make</mat-label>
+                <mat-select formControlName="make">
+                    @for (m of makes; track m) {
+                        <mat-option [value]="m">{{ m }}</mat-option>
+                    }
+                </mat-select>
+                <mat-error>
+                    @if (make?.hasError('required')) {
+                        Make is required
+                    }
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Model</mat-label>
+                <input matInput formControlName="model" type="text">
+                <mat-error>
+                    @if (model?.hasError('required')) {
+                        Model is required
+                    }
+                    @else if (model?.hasError('minlength')) {
+                        Model must be at least 2 character
+                    }
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Color</mat-label>
+                <mat-select formControlName="color">
+                    @for (c of colors; track c){
+                        <mat-option [value]="c">{{ c }}</mat-option>
+                    }
+                </mat-select>
+                <mat-error>
+                    @if (color?.hasError('required')) {
+                        Color is required
+                    } 
+                </mat-error>  
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Year</mat-label>
+                <input matInput formControlName="yearOfCar" type="number">
+                <mat-error>
+                    @if (yearOfCar?.hasError('required')) {
+                        Year is required
+                    }
+                    @else if (yearOfCar?.hasError('min')) {
+                        Year must be at least 1886
+                    }
+                    @else if (yearOfCar?.hasError('max')) {
+                        Year cannot be in the future
+                    }
+                </mat-error>
+            </mat-form-field>
+
+            <mat-card-actions>
+                <button mat-raised-button color="accent" type="submit" [disabled]="carForm.invalid">
+                    Submit
+                </button>
+            </mat-card-actions>
+            
+        </form>
+    </mat-card-content>
+</mat-card>

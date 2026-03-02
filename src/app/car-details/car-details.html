@@ -1,0 +1,15 @@
+@if (car$ | async; as car){
+  <section class="car-details">
+    <h2 class="car-title">{{ car.make }} {{ car.model }}</h2>
+
+    <app-car-form [car]="car"></app-car-form>
+
+    <div class="car-actions">
+      <button mat-flat-button color="warn" (click)="deleteCar()">
+        Delete
+      </button>
+    </div>
+  </section>
+} @else {
+  Loading car...
+}
