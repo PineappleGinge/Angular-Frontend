@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthCustomService } from '../users/auth-custom.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login.component',
@@ -34,18 +35,34 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    const values = this.loginForm.value;
+    if (this.loginForm.invalid) {
+      return;
+    }
+
+    const values = this.loginForm.getRawValue();
+    const email = values.email?.trim() ?? '';
+    const password = values.password ?? '';
+
     console.log('submit with ');
     console.table(values);
-    this.authService.login(this.email, this.password).
+    this.authService.login(email, password).
       subscribe({
         next: (response) => {
           console.log('user is logged in');
           this.router.navigateByUrl(this.returnUrl);
         },
-        error: (err: Error) => {
-          this.openErrorSnackBar('Incorrect email or password')
-          console.log(err.message);
+        error: (err: unknown) => {
+          if (err instanceof HttpErrorResponse) {
+            const backendMessage =
+              (typeof err.error === 'string' && err.error) ||
+              (typeof err.error?.message === 'string' && err.error.message) ||
+              '';
+            this.openErrorSnackBar(backendMessage || 'Unable to login. Please check your details.');
+            console.log(err.message);
+          } else {
+            this.openErrorSnackBar('Unable to login. Please try again.');
+            console.log('Unknown login error', err);
+          }
         }
 
       });
@@ -61,8 +78,8 @@ export class LoginComponent {
 
   openErrorSnackBar(message: string): void {
     this.snackBar.open(message, 'Dismiss', {
-      duration: 15000, // Set the duration for how long the snackbar should be visible (in milliseconds)
-      panelClass: ['error-snackbar'], // You can define custom styles for the snackbar
+      duration: 15000, 
+      panelClass: ['error-snackbar'], 
     });
   }
 
