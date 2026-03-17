@@ -24,7 +24,7 @@
     </a>
 
     <a *ngIf="isAuthenticated$ | async" routerLink="/user-list" routerLinkActive="active">Users</a>
-    <a *ngIf="isAuthenticated$ | async" routerLink="/userform" routerLinkActive="active">Add User</a>
+    <a *ngIf="isAuthenticated$ | async" routerLink="/userform" routerLinkActive="active">Register User</a>
     <a routerLink="/car-list" routerLinkActive="active">Cars</a>
     <a *ngIf="isAuthenticated$ | async" routerLink="/carform" routerLinkActive="active">Add Car</a>
     <a *ngIf="!(isAuthenticated$ | async)" routerLink="/login" routerLinkActive="active">Login</a>
