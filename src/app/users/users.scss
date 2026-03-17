@@ -1,8 +1,10 @@
-﻿.user-list {
+.user-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 12px 4px;
+  max-width: 1700px;
+  margin: 20px auto 0;
 }
 
 .list-header {
@@ -118,3 +120,4 @@
     padding: 14px 14px 12px;
   }
 }
+
