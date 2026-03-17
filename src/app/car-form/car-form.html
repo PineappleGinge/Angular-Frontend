@@ -22,13 +22,14 @@
 
             <mat-form-field appearance="fill" class="full-width">
                 <mat-label>Model</mat-label>
-                <input matInput formControlName="model" type="text">
+                <mat-select formControlName="model" [disabled]="!availableModels.length">
+                    @for (modelName of availableModels; track modelName) {
+                        <mat-option [value]="modelName">{{ modelName }}</mat-option>
+                    }
+                </mat-select>
                 <mat-error>
                     @if (model?.hasError('required')) {
                         Model is required
-                    }
-                    @else if (model?.hasError('minlength')) {
-                        Model must be at least 2 character
                     }
                 </mat-error>
             </mat-form-field>

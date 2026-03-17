@@ -1,4 +1,5 @@
-import { Component, effect, inject, input } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +10,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CarService } from '../cars/car.service';
-import { Car, Color, Make } from '../cars/car.interface';
+import { Car, Color, Make, modelsByMake } from '../cars/car.interface';
 
 @Component({
   selector: 'app-car-form',
@@ -30,6 +31,7 @@ import { Car, Color, Make } from '../cars/car.interface';
 export class CarForm {
   car = input<Car | undefined>();
 
+  private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
   private carService = inject(CarService);
   private router = inject(Router);
@@ -39,7 +41,7 @@ export class CarForm {
 
   carForm = this.fb.group({
     make: ['', Validators.required],
-    model: ['', [Validators.required, Validators.minLength(2)]],
+    model: ['', Validators.required],
     color: ['', Validators.required],
     yearOfCar: [
       null as number | null,
@@ -52,6 +54,10 @@ export class CarForm {
   });
 
   constructor() {
+    this.make?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.onMakeChange());
+
     effect(() => {
       const c = this.car();
       if (c) {
@@ -61,8 +67,17 @@ export class CarForm {
           color: c.color,
           yearOfCar: c.yearOfCar ?? c.year ?? null,
         });
+        this.onMakeChange();
       }
     });
+  }
+
+  get availableModels(): readonly string[] {
+    const selectedMake = this.make?.value as Make | null;
+    if (!selectedMake) {
+      return [];
+    }
+    return modelsByMake[selectedMake] ?? [];
   }
 
   get make() {
@@ -79,6 +94,17 @@ export class CarForm {
 
   get yearOfCar() {
     return this.carForm.get('yearOfCar');
+  }
+
+  onMakeChange() {
+    const currentModel = this.model?.value as string | null;
+    if (!currentModel) {
+      return;
+    }
+
+    if (!this.availableModels.includes(currentModel)) {
+      this.model?.setValue('');
+    }
   }
 
   onSubmit() {
