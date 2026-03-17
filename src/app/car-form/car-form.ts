@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject, input } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -31,6 +31,14 @@ import { Car, Color, Make, modelsByMake } from '../cars/car.interface';
 export class CarForm {
   car = input<Car | undefined>();
   private readonly imageUrlPattern = /^https?:\/\/.+/i;
+  readonly selectedMake = signal<Make | null>(null);
+  readonly availableModels = computed((): readonly string[] => {
+    const make = this.selectedMake();
+    if (!make) {
+      return [];
+    }
+    return modelsByMake[make] ?? [];
+  });
 
   private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
@@ -61,7 +69,10 @@ export class CarForm {
   constructor() {
     this.make?.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.onMakeChange());
+      .subscribe((make) => {
+        this.selectedMake.set((make as Make | null) ?? null);
+        this.onMakeChange();
+      });
 
     effect(() => {
       const c = this.car();
@@ -73,17 +84,10 @@ export class CarForm {
           yearOfCar: c.yearOfCar ?? c.year ?? null,
           imageUrl: c.imageUrl ?? '',
         });
+        this.selectedMake.set(c.make);
         this.onMakeChange();
       }
     });
-  }
-
-  get availableModels(): readonly string[] {
-    const selectedMake = this.make?.value as Make | null;
-    if (!selectedMake) {
-      return [];
-    }
-    return modelsByMake[selectedMake] ?? [];
   }
 
   get make() {
@@ -112,7 +116,7 @@ export class CarForm {
       return;
     }
 
-    if (!this.availableModels.includes(currentModel)) {
+    if (!this.availableModels().includes(currentModel)) {
       this.model?.setValue('');
     }
   }

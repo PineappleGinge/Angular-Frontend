@@ -22,8 +22,8 @@
 
             <mat-form-field appearance="fill" class="full-width">
                 <mat-label>Model</mat-label>
-                <mat-select formControlName="model" [disabled]="!availableModels.length">
-                    @for (modelName of availableModels; track modelName) {
+                <mat-select formControlName="model" [disabled]="!availableModels().length">
+                    @for (modelName of availableModels(); track modelName) {
                         <mat-option [value]="modelName">{{ modelName }}</mat-option>
                     }
                 </mat-select>

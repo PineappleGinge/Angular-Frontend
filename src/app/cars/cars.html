@@ -1,13 +1,19 @@
-﻿<section class="car-list">
+<section class="car-list">
   <div class="list-header">
     <h2>Car List</h2>
     <p class="subtitle">Browse available cars and open their details.</p>
   </div>
 
-  @if (cars$ | async; as cars) {
-    @if (cars.length) {
+  @if (carsState().loading) {
+    <div class="loading">Loading cars...</div>
+  } @else if (carsState().error; as error) {
+    <div class="empty">
+      <p>{{ error }}</p>
+    </div>
+  } @else {
+    @if (filteredCars().length) {
       <div class="car-grid">
-        @for (car of cars; track car._id) {
+        @for (car of filteredCars(); track car._id) {
           <article class="car-card">
             <div class="car-main">
               @if (car.imageUrl) {
@@ -35,7 +41,5 @@
         <p>No cars found.</p>
       </div>
     }
-  } @else {
-    <div class="loading">Loading cars...</div>
   }
 </section>
