@@ -1,17 +1,63 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpHandlerFn, HttpRequest, HttpResponse } from '@angular/common/http';
+import { provideRouter, Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
 
-import { authInterceptor } from './auth-interceptor';
+import { AuthInterceptor } from './auth-interceptor';
 
-describe('authInterceptor', () => {
-  const interceptor: HttpInterceptorFn = (req, next) => 
-    TestBed.runInInjectionContext(() => authInterceptor(req, next));
+describe('AuthInterceptor', () => {
+  const runInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn) =>
+    TestBed.runInInjectionContext(() => AuthInterceptor(req, next));
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [provideRouter([])],
+    });
+    localStorage.clear();
   });
 
-  it('should be created', () => {
-    expect(interceptor).toBeTruthy();
+  it('should attach bearer token to non-auth API requests', () => {
+    localStorage.setItem('token', 'abc.def.ghi');
+    const req = new HttpRequest('GET', 'http://localhost:3000/api/v1/cars');
+    let capturedRequest: HttpRequest<unknown> | null = null;
+
+    runInterceptor(req, (forwardedReq) => {
+      capturedRequest = forwardedReq;
+      return of(new HttpResponse({ status: 200 }));
+    }).subscribe();
+
+    expect(capturedRequest).not.toBeNull();
+    expect(capturedRequest!.headers.get('Authorization')).toBe('Bearer abc.def.ghi');
+  });
+
+  it('should not attach token to auth endpoint requests', () => {
+    localStorage.setItem('token', 'abc.def.ghi');
+    const req = new HttpRequest('POST', 'http://localhost:3000/api/v1/auth', {});
+    let capturedRequest: HttpRequest<unknown> | null = null;
+
+    runInterceptor(req, (forwardedReq) => {
+      capturedRequest = forwardedReq;
+      return of(new HttpResponse({ status: 200 }));
+    }).subscribe();
+
+    expect(capturedRequest).not.toBeNull();
+    expect(capturedRequest!.headers.has('Authorization')).toBeFalse();
+  });
+
+  it('should clear auth storage and redirect on 401 for non-auth endpoints', () => {
+    localStorage.setItem('token', 'abc.def.ghi');
+    localStorage.setItem('user', '{"id":1}');
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+
+    const req = new HttpRequest('GET', 'http://localhost:3000/api/v1/cars');
+
+    runInterceptor(req, () =>
+      throwError(() => new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' }))
+    ).subscribe({ error: () => undefined });
+
+    expect(localStorage.getItem('token')).toBeNull();
+    expect(localStorage.getItem('user')).toBeNull();
+    expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 });
