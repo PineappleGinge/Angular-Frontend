@@ -1,6 +1,12 @@
 @if (car$ | async; as car){
   <section class="car-details">
-    <h2 class="car-title">{{ car.make }} {{ car.model }}</h2>
+    <div class="car-header">
+      <a mat-stroked-button color="primary" routerLink="/car-list">
+        Back to Cars
+      </a>
+      <h2 class="car-title">{{ car.make }} {{ car.model }}</h2>
+      <span class="car-header-spacer" aria-hidden="true"></span>
+    </div>
 
     <div class="car-info-card">
       @if (car.imageUrl) {
