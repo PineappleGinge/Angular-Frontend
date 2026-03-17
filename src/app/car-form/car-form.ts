@@ -30,6 +30,7 @@ import { Car, Color, Make, modelsByMake } from '../cars/car.interface';
 })
 export class CarForm {
   car = input<Car | undefined>();
+  private readonly imageUrlPattern = /^https?:\/\/.+/i;
 
   private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
@@ -51,6 +52,10 @@ export class CarForm {
         Validators.max(new Date().getFullYear()),
       ],
     ],
+    imageUrl: [
+      '',
+      [Validators.pattern(this.imageUrlPattern)],
+    ],
   });
 
   constructor() {
@@ -66,6 +71,7 @@ export class CarForm {
           model: c.model,
           color: c.color,
           yearOfCar: c.yearOfCar ?? c.year ?? null,
+          imageUrl: c.imageUrl ?? '',
         });
         this.onMakeChange();
       }
@@ -96,6 +102,10 @@ export class CarForm {
     return this.carForm.get('yearOfCar');
   }
 
+  get imageUrl() {
+    return this.carForm.get('imageUrl');
+  }
+
   onMakeChange() {
     const currentModel = this.model?.value as string | null;
     if (!currentModel) {
@@ -114,6 +124,9 @@ export class CarForm {
       value.yearOfCar = Number(value.yearOfCar);
     }
     value.year = value.yearOfCar ?? null;
+    value.imageUrl = typeof value.imageUrl === 'string' && value.imageUrl.trim()
+      ? value.imageUrl.trim()
+      : null;
 
     if (!this.car()) {
       this.carService.addCar(value as Car).subscribe({

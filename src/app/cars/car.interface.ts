@@ -62,4 +62,5 @@ export interface Car {
   color: Color;
   yearOfCar?: number | null;
   year?: number | null;
+  imageUrl?: string | null;
 }

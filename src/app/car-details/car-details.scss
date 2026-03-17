@@ -16,6 +16,60 @@
   color: #1f2937;
 }
 
+.car-info-card {
+  width: 60%;
+  max-width: 900px;
+  min-width: 360px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 16px;
+}
+
+.car-details-image,
+.car-details-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  margin: 0 auto 14px;
+}
+
+.car-details-image {
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+.car-details-avatar {
+  background: linear-gradient(140deg, #0ea5e9, #0284c7);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: 700;
+}
+
+.car-info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.car-info-row:last-child {
+  border-bottom: 0;
+}
+
+.label {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.value {
+  color: #111827;
+}
+
 .car-details app-car-form {
   width: 60%;
   max-width: 900px;
@@ -25,10 +79,16 @@
 .car-actions {
   display: flex;
   justify-content: center;
+  gap: 12px;
   width: 100%;
 }
 
 @media (max-width: 640px) {
+  .car-info-card {
+    width: 90%;
+    min-width: 0;
+  }
+
   .car-details app-car-form {
     width: 90%;
     min-width: 0;

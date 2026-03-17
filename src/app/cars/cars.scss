@@ -68,6 +68,14 @@
   letter-spacing: 0.2px;
 }
 
+.car-image {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
 .car-content {
   display: flex;
   flex-direction: column;

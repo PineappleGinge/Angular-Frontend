@@ -10,9 +10,13 @@
         @for (car of cars; track car._id) {
           <article class="car-card">
             <div class="car-main">
-              <div class="car-avatar" aria-hidden="true">
-                {{ car.make?.charAt(0) || '?' }}
-              </div>
+              @if (car.imageUrl) {
+                <img class="car-image" [src]="car.imageUrl" [alt]="car.make + ' ' + car.model">
+              } @else {
+                <div class="car-avatar" aria-hidden="true">
+                  {{ car.make.charAt(0) || '?' }}
+                </div>
+              }
               <div class="car-content">
                 <div class="car-name">{{ car.make }} {{ car.model }}</div>
                 <div class="car-id">ID: {{ car._id }}</div>

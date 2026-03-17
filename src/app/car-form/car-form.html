@@ -64,6 +64,16 @@
                 </mat-error>
             </mat-form-field>
 
+            <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Image URL</mat-label>
+                <input matInput formControlName="imageUrl" type="url" placeholder="https://example.com/car.jpg">
+                <mat-error>
+                    @if (imageUrl?.hasError('pattern')) {
+                        Enter a valid URL starting with http:// or https://
+                    }
+                </mat-error>
+            </mat-form-field>
+
             <mat-card-actions>
                 <button mat-raised-button color="accent" type="submit" [disabled]="carForm.invalid">
                     Submit

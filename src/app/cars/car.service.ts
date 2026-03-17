@@ -13,21 +13,60 @@ export class CarService {
 
   private apiUrl = `${environment.apiUri}/api/v1/cars`;
 
+  private parseYear(value: unknown): number | null {
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return Math.trunc(value);
+    }
+
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+      return value.getFullYear();
+    }
+
+    if (typeof value === 'string') {
+      const numeric = Number(value);
+      if (Number.isFinite(numeric)) {
+        return Math.trunc(numeric);
+      }
+
+      const parsedDate = new Date(value);
+      if (!Number.isNaN(parsedDate.getTime())) {
+        return parsedDate.getFullYear();
+      }
+    }
+
+    return null;
+  }
+
+  private normalizeImageUrl(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  }
+
   private normalizeCar(car: Car): Car {
-    const normalizedYear = car.yearOfCar ?? car.year ?? null;
+    const normalizedYear = this.parseYear(car.yearOfCar) ?? this.parseYear(car.year);
     return {
       ...car,
       yearOfCar: normalizedYear,
       year: normalizedYear,
+      imageUrl: this.normalizeImageUrl(car.imageUrl),
     };
   }
 
   private toApiCar(car: Car): Car {
-    const normalizedYear = car.yearOfCar ?? car.year ?? null;
+    const normalizedYear = this.parseYear(car.yearOfCar) ?? this.parseYear(car.year);
     return {
       ...car,
       yearOfCar: normalizedYear,
       year: normalizedYear,
+      imageUrl: this.normalizeImageUrl(car.imageUrl),
     };
   }
 

@@ -31,6 +31,7 @@ export class CarDetails {
 
   id: string = ""
   car$ : Observable<Car> | undefined
+  isEditing = false;
 
   ngOnInit(): void{
     this.id = this.route.snapshot.paramMap.get('id') || "";
@@ -41,6 +42,10 @@ export class CarDetails {
 
   deleteCar(): void {
     this.openConfirmDeleteDialog();
+  }
+
+  toggleEdit(): void {
+    this.isEditing = !this.isEditing;
   }
 
   deleteItem(): void {
