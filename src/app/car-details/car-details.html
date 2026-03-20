@@ -34,16 +34,46 @@
       </div>
     </div>
 
-    <div class="car-actions">
-      <button mat-raised-button color="accent" (click)="toggleEdit()">
-        {{ isEditing ? 'Close Edit' : 'Edit Details' }}
-      </button>
-      <button mat-flat-button color="warn" (click)="deleteCar()">
-        Delete
-      </button>
-    </div>
+    <section class="value-card">
+      <div class="value-card-header">
+        <h3>Estimated Market Value</h3>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="estimateValue(car)"
+          [disabled]="vehicleValueLoading"
+        >
+          {{ vehicleValueLoading ? 'Estimating...' : 'Estimate Value' }}
+        </button>
+      </div>
 
-    @if (isEditing) {
+      @if (vehicleValueLoading) {
+        <p class="value-loading">Estimating market value...</p>
+      } @else if (vehicleValueError; as errorMessage) {
+        <p class="value-error">{{ errorMessage }}</p>
+      } @else if (vehicleValueResponse) {
+        @if (displayVehicleValue; as bestValue) {
+          <div class="value-chip">{{ bestValue }}</div>
+        } @else {
+          <p class="value-hint">No estimate was available for this vehicle.</p>
+        }
+      } @else if (!hasRequestedVehicleValue) {
+        <p class="value-hint">Click "Estimate Value" to fetch current pricing insights.</p>
+      }
+    </section>
+
+    @if (isAuthenticated$ | async) {
+      <div class="car-actions">
+        <button mat-raised-button color="accent" (click)="toggleEdit()">
+          {{ isEditing ? 'Close Edit' : 'Edit Details' }}
+        </button>
+        <button mat-flat-button color="warn" (click)="deleteCar()">
+          Delete
+        </button>
+      </div>
+    }
+
+    @if ((isAuthenticated$ | async) && isEditing) {
       <app-car-form [car]="car"></app-car-form>
     }
   </section>

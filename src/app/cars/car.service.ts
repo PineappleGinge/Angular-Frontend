@@ -1,8 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, retry, catchError, throwError, map } from 'rxjs';
 import { Car } from './car.interface';
 import { environment } from '../../environments/environment';
+
+export interface VehicleValueResponse {
+  [key: string]: unknown;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +16,7 @@ export class CarService {
   private http = inject(HttpClient);
 
   private apiUrl = `${environment.apiUri}/api/v1/cars`;
+  private vehicleValueUrl = `${environment.apiUri}/api/cars/value`;
 
   private parseYear(value: unknown): number | null {
     if (value === null || value === undefined || value === '') {
@@ -119,6 +124,18 @@ export class CarService {
 
   deleteCar(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  getVehicleValue(make: string, model: string, year: number): Observable<VehicleValueResponse> {
+    const params = new HttpParams()
+      .set('make', make)
+      .set('model', model)
+      .set('year', String(year));
+
+    // Frontend calls our backend endpoint only; secrets/API keys must stay server-side.
+    return this.http.get<VehicleValueResponse>(this.vehicleValueUrl, { params }).pipe(
       catchError(this.handleError)
     );
   }

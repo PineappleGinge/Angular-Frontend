@@ -93,6 +93,77 @@
   min-width: 360px;
 }
 
+.value-card {
+  width: 60%;
+  max-width: 900px;
+  min-width: 360px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 16px;
+  text-align: left;
+}
+
+.value-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.value-card-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #1f2937;
+}
+
+.value-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #065f46;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.value-loading,
+.value-hint {
+  margin: 0;
+  color: #4b5563;
+}
+
+.value-error {
+  margin: 0;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.value-fallback-title {
+  margin: 0 0 8px;
+  color: #4b5563;
+}
+
+.value-fallback-json {
+  margin: 0;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  color: #1f2937;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow: auto;
+  max-height: 220px;
+}
+
 .car-actions {
   display: flex;
   justify-content: center;
@@ -123,6 +194,20 @@
   .car-info-card {
     width: 90%;
     min-width: 0;
+  }
+
+  .value-card {
+    width: 90%;
+    min-width: 0;
+  }
+
+  .value-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .value-chip {
+    font-size: 22px;
   }
 
   .car-details app-car-form {
