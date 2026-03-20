@@ -71,14 +71,14 @@ export class CarService {
   }
 
   private handleError(error: HttpErrorResponse) {
-    if (error.status === 401 || error.status === 403) {
-      return throwError(() => new Error('You are not authorised for that action'));
-    }
-
     const backendMessage =
       (typeof error.error === 'string' && error.error) ||
       (typeof error.error?.message === 'string' && error.error.message) ||
       '';
+
+    if (error.status === 401 || error.status === 403) {
+      return throwError(() => new Error(backendMessage || 'You are not authorised for that action'));
+    }
 
     if (error.status === 0) {
       console.error('A client-side or network error occurred:', error.error);

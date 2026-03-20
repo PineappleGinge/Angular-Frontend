@@ -8,6 +8,9 @@ import { User } from './user.interface';
   providedIn: 'root',
 })
 export class AuthCustomService {
+  private static readonly ACCESS_TOKEN_KEY = 'accessToken';
+  private static readonly LEGACY_TOKEN_KEY = 'token';
+
   readonly currentUser$: BehaviorSubject<User | null>;
   readonly isAuthenticated$: BehaviorSubject<boolean>;
 
@@ -20,7 +23,7 @@ export class AuthCustomService {
     this.currentUser$ = new BehaviorSubject<User | null>(initialUser);
     this.isAuthenticated$ = new BehaviorSubject<boolean>(false);
 
-    const token = localStorage.getItem('token') || '';
+    const token = this.getStoredAccessToken();
     const expires = token ? this.getExpiryFromToken(token) : null;
     if (expires && expires > Date.now()) {
       this.isAuthenticated$.next(true);
@@ -30,16 +33,18 @@ export class AuthCustomService {
 
   login(email: string, password: string) {
     return this.http
-      .post<{ token: string; user: User }>(`${this.apiUrl}`, { email, password })
+      .post<{ accessToken: string; user: User; token?: string }>(`${this.apiUrl}`, { email, password })
       .pipe(
         tap((response) => {
-          const { token, user } = response;
-          localStorage.setItem('token', token);
+          const accessToken = response.accessToken || response.token || '';
+          const { user } = response;
+          localStorage.setItem(AuthCustomService.ACCESS_TOKEN_KEY, accessToken);
+          localStorage.removeItem(AuthCustomService.LEGACY_TOKEN_KEY);
           localStorage.setItem('user', JSON.stringify(user));
           this.currentUser$.next(user);
           this.isAuthenticated$.next(true);
 
-          const expires = this.getExpiryFromToken(token);
+          const expires = this.getExpiryFromToken(accessToken);
           if (expires) {
             this.startAuthenticateTimer(expires);
           }
@@ -53,7 +58,8 @@ export class AuthCustomService {
       this.authenticateTimeout = undefined;
     }
     localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    localStorage.removeItem(AuthCustomService.ACCESS_TOKEN_KEY);
+    localStorage.removeItem(AuthCustomService.LEGACY_TOKEN_KEY);
     this.currentUser$.next(null);
     this.isAuthenticated$.next(false);
   }
@@ -93,5 +99,21 @@ export class AuthCustomService {
       localStorage.removeItem('user');
       return null;
     }
+  }
+
+  private getStoredAccessToken(): string {
+    const accessToken = localStorage.getItem(AuthCustomService.ACCESS_TOKEN_KEY)?.trim();
+    if (accessToken) {
+      return accessToken;
+    }
+
+    const legacyToken = localStorage.getItem(AuthCustomService.LEGACY_TOKEN_KEY)?.trim();
+    if (legacyToken) {
+      localStorage.setItem(AuthCustomService.ACCESS_TOKEN_KEY, legacyToken);
+      localStorage.removeItem(AuthCustomService.LEGACY_TOKEN_KEY);
+      return legacyToken;
+    }
+
+    return '';
   }
 }

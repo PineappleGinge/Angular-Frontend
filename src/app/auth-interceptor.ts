@@ -10,7 +10,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   const isApiRequest = req.url.startsWith(apiUri);
   const isAuthRequest = req.url.startsWith(`${apiUri}/api/v1/auth`);
 
-  const rawToken = localStorage.getItem('token');
+  const rawToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
   const jwt = rawToken?.trim();
   const hasValidJwt =
     !!jwt &&
@@ -27,20 +27,24 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     ? req.clone({ setHeaders: { Authorization: `Bearer ${jwt}` } })
     : req;
 
-    return next(authRequest).pipe(
-      catchError((err) => {
-        console.log('Request failed ' + err.status);
+  return next(authRequest).pipe(
+    catchError((err) => {
+      const backendMessage =
+        (typeof err?.error === 'string' && err.error) ||
+        (typeof err?.error?.message === 'string' && err.error.message) ||
+        err?.message ||
+        'Request failed';
 
-        
-      // Handle missing or invalid JWT (401 or 403)
-      if ((err.status === 401 || err.status === 403) && !isAuthRequest) {
+      console.error(`Request failed ${err?.status}: ${backendMessage}`);
+
+      if (err?.status === 401 && !isAuthRequest) {
+        localStorage.removeItem('accessToken');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        router.navigate(['/login']); // Redirect to login page
+        router.navigate(['/login']);
       }
 
-        return throwError(() => err);
-      })
-    );
-
-}
+      return throwError(() => err);
+    })
+  );
+};

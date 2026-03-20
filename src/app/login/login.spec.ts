@@ -42,7 +42,7 @@ describe('LoginComponent', () => {
   });
 
   it('should submit credentials and navigate to returnUrl on success', () => {
-    authServiceSpy.login.and.returnValue(of({ token: 'a.b.c', user: {} as any }));
+    authServiceSpy.login.and.returnValue(of({ accessToken: 'a.b.c', user: {} as any }));
 
     component.loginForm.setValue({
       email: 'test@example.com',

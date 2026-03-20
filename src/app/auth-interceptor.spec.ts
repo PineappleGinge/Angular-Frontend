@@ -17,7 +17,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('should attach bearer token to non-auth API requests', () => {
-    localStorage.setItem('token', 'abc.def.ghi');
+    localStorage.setItem('accessToken', 'abc.def.ghi');
     const req = new HttpRequest('GET', 'http://localhost:3000/api/v1/cars');
     let capturedRequest: HttpRequest<unknown> | null = null;
 
@@ -31,7 +31,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('should not attach token to auth endpoint requests', () => {
-    localStorage.setItem('token', 'abc.def.ghi');
+    localStorage.setItem('accessToken', 'abc.def.ghi');
     const req = new HttpRequest('POST', 'http://localhost:3000/api/v1/auth', {});
     let capturedRequest: HttpRequest<unknown> | null = null;
 
@@ -44,8 +44,22 @@ describe('AuthInterceptor', () => {
     expect(capturedRequest!.headers.has('Authorization')).toBeFalse();
   });
 
+  it('should not attach malformed bearer token', () => {
+    localStorage.setItem('accessToken', 'not-a-jwt');
+    const req = new HttpRequest('DELETE', 'http://localhost:3000/api/v1/cars/1');
+    let capturedRequest: HttpRequest<unknown> | null = null;
+
+    runInterceptor(req, (forwardedReq) => {
+      capturedRequest = forwardedReq;
+      return of(new HttpResponse({ status: 200 }));
+    }).subscribe();
+
+    expect(capturedRequest).not.toBeNull();
+    expect(capturedRequest!.headers.has('Authorization')).toBeFalse();
+  });
+
   it('should clear auth storage and redirect on 401 for non-auth endpoints', () => {
-    localStorage.setItem('token', 'abc.def.ghi');
+    localStorage.setItem('accessToken', 'abc.def.ghi');
     localStorage.setItem('user', '{"id":1}');
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
@@ -56,8 +70,25 @@ describe('AuthInterceptor', () => {
       throwError(() => new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' }))
     ).subscribe({ error: () => undefined });
 
-    expect(localStorage.getItem('token')).toBeNull();
+    expect(localStorage.getItem('accessToken')).toBeNull();
     expect(localStorage.getItem('user')).toBeNull();
     expect(router.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('should preserve auth storage and not redirect on 403 for non-auth endpoints', () => {
+    localStorage.setItem('accessToken', 'abc.def.ghi');
+    localStorage.setItem('user', '{"id":1}');
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+
+    const req = new HttpRequest('POST', 'http://localhost:3000/api/v1/cars', {});
+
+    runInterceptor(req, () =>
+      throwError(() => new HttpErrorResponse({ status: 403, statusText: 'Forbidden' }))
+    ).subscribe({ error: () => undefined });
+
+    expect(localStorage.getItem('accessToken')).toBe('abc.def.ghi');
+    expect(localStorage.getItem('user')).toBe('{"id":1}');
+    expect(router.navigate).not.toHaveBeenCalled();
   });
 });

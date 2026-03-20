@@ -19,16 +19,21 @@ export class UserService {
       return throwError(() => new Error('Something bad happened; please try again later.'));
     }
 
+    const backendMessage =
+      (typeof error.error === 'string' && error.error) ||
+      (typeof error.error?.message === 'string' && error.error.message) ||
+      '';
+
     if (error.status == 401 || error.status == 403) {
       console.log('authorisation issue ', error.status);
-      return throwError(() => new Error('You are not authorised for that action'));
+      return throwError(() => new Error(backendMessage || 'You are not authorised for that action'));
     }
     if (error.status === 0) {
       console.error('A client-side or network error occurred:', error.error);
     } else {
       console.error(`Backend returned code ${error.status}, body was: `, error.error);
     }
-    return throwError(() => new Error('Something bad happened; please try again later.'));
+    return throwError(() => new Error(backendMessage || 'Something bad happened; please try again later.'));
   }
 
   getUsers(): Observable<User[]> {
