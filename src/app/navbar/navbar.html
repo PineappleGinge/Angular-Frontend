@@ -2,6 +2,8 @@
   <span class="navbar-brand">Car Showcase</span>
 
   <div class="navbar-main">
+    <a *ngIf="isAuthenticated$ | async" routerLink="/dashboard" routerLinkActive="active">Admin Dashboard</a>
+
     <form class="navbar-search" (ngSubmit)="onSearch()">
       <select [(ngModel)]="entity" name="entity">
         <option value="cars">Cars</option>

@@ -10,6 +10,10 @@ import { authGuard } from './auth-guard';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'car-list' },
   { path: 'home', component: Home },
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
+  },
   { path: 'user-list', component: Users, canActivate: [authGuard] },
   { path: 'userform', component: UserForm, canActivate: [authGuard] },
   {

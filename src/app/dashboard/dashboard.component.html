@@ -1,0 +1,81 @@
+<section class="dashboard">
+  <header class="dashboard-header">
+    <h2>Dashboard</h2>
+    <p class="subtitle">System statistics overview</p>
+  </header>
+
+  @if (loading) {
+    <div class="state-card">Loading dashboard stats...</div>
+  } @else if (error; as errorMessage) {
+    <div class="state-card error">{{ errorMessage }}</div>
+  } @else if (stats) {
+    <div class="summary-grid">
+      <article class="card">
+        <h3>Total Cars</h3>
+        <p class="metric">{{ stats.totalCars }}</p>
+      </article>
+
+      <article class="card">
+        <h3>Total Users</h3>
+        <p class="metric">{{ stats.totalUsers }}</p>
+      </article>
+    </div>
+
+    <div class="detail-grid">
+      <article class="card">
+        <h3>Cars By Make</h3>
+        @if (stats.carsByMake.length) {
+          <ul>
+            @for (item of stats.carsByMake; track $index) {
+              <li><span>{{ item.label }}</span><strong>{{ item.count }}</strong></li>
+            }
+          </ul>
+        } @else {
+          <p class="empty">No data</p>
+        }
+      </article>
+
+      <article class="card">
+        <h3>Cars By Color</h3>
+        @if (stats.carsByColor.length) {
+          <ul>
+            @for (item of stats.carsByColor; track $index) {
+              <li><span>{{ item.label }}</span><strong>{{ item.count }}</strong></li>
+            }
+          </ul>
+        } @else {
+          <p class="empty">No data</p>
+        }
+      </article>
+
+      <article class="card">
+        <h3>Cars By Year</h3>
+        @if (stats.carsByYear.length) {
+          <ul>
+            @for (item of stats.carsByYear; track $index) {
+              <li><span>{{ item.label }}</span><strong>{{ item.count }}</strong></li>
+            }
+          </ul>
+        } @else {
+          <p class="empty">No data</p>
+        }
+      </article>
+
+      <article class="card latest-card">
+        <h3>Latest Cars</h3>
+        @if (stats.latestCars?.length) {
+          <ul>
+            @for (car of stats.latestCars; track car._id ?? $index) {
+              <li>
+                <div class="latest-main">{{ car.make }} {{ car.model }}</div>
+                <div class="latest-sub">{{ car.yearOfCar ?? car.year ?? 'N/A' }}</div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="empty">No data</p>
+        }
+      </article>
+    </div>
+  }
+</section>

@@ -25,9 +25,12 @@ export class AuthCustomService {
 
     const token = this.getStoredAccessToken();
     const expires = token ? this.getExpiryFromToken(token) : null;
-    if (expires && expires > Date.now()) {
+    if (initialUser && expires && expires > Date.now()) {
       this.isAuthenticated$.next(true);
       this.startAuthenticateTimer(expires);
+    } else if (token || initialUser) {
+      // Clear stale/inconsistent stored session state.
+      this.logout();
     }
   }
 
