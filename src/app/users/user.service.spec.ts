@@ -55,7 +55,7 @@ describe('UserService', () => {
 
   it('should return generic error for non-http errors', () => {
     let errorMessage = '';
-    // Force handleError via updateUser path with invalid server response
+    
     service.updateUser('1', {} as any).subscribe({
       error: (err: Error) => {
         errorMessage = err.message;

@@ -134,7 +134,7 @@ export class CarService {
       .set('model', model)
       .set('year', String(year));
 
-    // Frontend calls our backend endpoint only; secrets/API keys must stay server-side.
+
     return this.http.get<VehicleValueResponse>(this.vehicleValueUrl, { params }).pipe(
       catchError(this.handleError)
     );

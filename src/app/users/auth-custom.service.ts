@@ -29,7 +29,7 @@ export class AuthCustomService {
       this.isAuthenticated$.next(true);
       this.startAuthenticateTimer(expires);
     } else if (token || initialUser) {
-      // Clear stale/inconsistent stored session state.
+      
       this.logout();
     }
   }
