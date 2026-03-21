@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, retry, catchError, throwError } from 'rxjs';
-import { User } from './user.interface';
+import { CreateUserRequest, UpdateUserRequest, User } from './user.interface';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -49,13 +49,21 @@ export class UserService {
     );
   }
 
-  addUser(user: User): Observable<User> {
-    return this.http.post<User>(this.apiUrl, user).pipe(
-      catchError(this.handleError)
-    );
+  createUser(user: CreateUserRequest): Observable<User> {
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('token') || '';
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token.trim()}`,
+      'Content-Type': 'application/json',
+    });
+
+    return this.http.post<User>(this.apiUrl, user, { headers });
   }
 
-  updateUser(id: string, user: User): Observable<User> {
+  addUser(user: CreateUserRequest): Observable<User> {
+    return this.createUser(user);
+  }
+
+  updateUser(id: string, user: UpdateUserRequest): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/${id}`, user).pipe(
       catchError(this.handleError)
     );

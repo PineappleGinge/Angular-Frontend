@@ -1,11 +1,11 @@
-import { Component, inject, Input, input, effect } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormControl, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { Component, inject, input, effect } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { User } from '../users/user.interface';
+import { CreateUserRequest, UpdateUserRequest, User } from '../users/user.interface';
 import { UserService } from '../users/user.service';
 import { Router } from '@angular/router';
 
@@ -67,24 +67,39 @@ export class UserForm {
   }
 
   onSubmit(){
-    const formValue = this.userForm.value as Partial<User>;
+    const values = this.userForm.getRawValue();
 
     console.log('Form Submitted!');
-    console.table(formValue);
+    console.table(values);
 
-  if (this.user()) {
-    this.userService.updateUser(String(this.user()!._id), formValue as User)
+    if (this.user()) {
+      const updatePayload: UpdateUserRequest = {
+        name: values.name?.trim() ?? '',
+        email: values.email?.trim() ?? '',
+        phonenumber: values.phonenumber?.trim() ?? '',
+        dob: values.dob ?? '',
+      };
+
+      this.userService.updateUser(String(this.user()!._id), updatePayload)
+        .subscribe({
+          next: () => this.router.navigateByUrl('/user-list'),
+          error: (err: Error) => console.log(err.message)
+        });
+    } else {
+      const createPayload: CreateUserRequest = {
+        name: values.name?.trim() ?? '',
+        email: values.email?.trim() ?? '',
+        phonenumber: values.phonenumber?.trim() ?? '',
+        dob: values.dob ?? '',
+        password: 'TempPass123!',
+      };
+
+      this.userService.createUser(createPayload)
       .subscribe({
         next: () => this.router.navigateByUrl('/user-list'),
         error: (err: Error) => console.log(err.message)
       });
-  } else {
-    this.userService.addUser(formValue as User)
-      .subscribe({
-        next: () => this.router.navigateByUrl('/user-list'),
-        error: (err: Error) => console.log(err.message)
-      });
-  }
+    }
   }
 
   updateName(){

@@ -12,9 +12,9 @@ describe('UserForm', () => {
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    userServiceSpy = jasmine.createSpyObj<UserService>('UserService', ['addUser', 'updateUser']);
+    userServiceSpy = jasmine.createSpyObj<UserService>('UserService', ['createUser', 'updateUser']);
     routerSpy = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
-    userServiceSpy.addUser.and.returnValue(of({} as any));
+    userServiceSpy.createUser.and.returnValue(of({} as any));
     userServiceSpy.updateUser.and.returnValue(of({} as any));
 
     await TestBed.configureTestingModule({
