@@ -4,10 +4,12 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 
 import { CarService } from './car.service';
 import { Make, Color } from './car.interface';
+import { environment } from '../../environments/environment';
 
 describe('CarService', () => {
   let service: CarService;
   let httpMock: HttpTestingController;
+  const carsUrl = `${environment.apiUri}/api/v1/cars`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -31,7 +33,7 @@ describe('CarService', () => {
       result = cars;
     });
 
-    const req = httpMock.expectOne('http://localhost:3000/api/v1/cars');
+    const req = httpMock.expectOne(carsUrl);
     expect(req.request.method).toBe('GET');
     req.flush([
       { _id: '1', make: Make.Ford, model: 'Mustang', color: Color.Black, yearOfCar: '1970', imageUrl: '  https://img  ' },
@@ -54,7 +56,7 @@ describe('CarService', () => {
       imageUrl: '   ',
     } as any).subscribe();
 
-    const req = httpMock.expectOne('http://localhost:3000/api/v1/cars');
+    const req = httpMock.expectOne(carsUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body.yearOfCar).toBe(2021);
     expect(req.request.body.year).toBe(2021);
@@ -70,7 +72,7 @@ describe('CarService', () => {
       },
     });
 
-    const req = httpMock.expectOne('http://localhost:3000/api/v1/cars/1');
+    const req = httpMock.expectOne(`${carsUrl}/1`);
     expect(req.request.method).toBe('DELETE');
     req.flush({}, { status: 401, statusText: 'Unauthorized' });
 

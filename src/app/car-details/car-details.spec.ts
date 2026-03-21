@@ -4,15 +4,22 @@ import { of, throwError } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { BehaviorSubject } from 'rxjs';
 
 import { CarDetails } from './car-details';
 import { CarService } from '../cars/car.service';
+import { AuthCustomService } from '../users/auth-custom.service';
 
 describe('CarDetails', () => {
   let component: CarDetails;
   let fixture: ComponentFixture<CarDetails>;
   let carServiceSpy: jasmine.SpyObj<CarService>;
   let router: Router;
+  const authServiceStub = {
+    isAuthenticated$: new BehaviorSubject<boolean>(true),
+  };
 
   beforeEach(async () => {
     carServiceSpy = jasmine.createSpyObj<CarService>('CarService', ['getCarById', 'deleteCar']);
@@ -23,6 +30,8 @@ describe('CarDetails', () => {
       imports: [CarDetails],
       providers: [
         { provide: CarService, useValue: carServiceSpy },
+        provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([]),
         {
           provide: ActivatedRoute,
@@ -33,6 +42,7 @@ describe('CarDetails', () => {
           useValue: { open: () => ({ afterClosed: () => of(false) }) },
         },
         { provide: MatSnackBar, useValue: jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']) },
+        { provide: AuthCustomService, useValue: authServiceStub },
       ],
     })
     .compileComponents();

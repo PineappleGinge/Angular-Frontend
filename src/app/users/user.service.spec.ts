@@ -3,10 +3,12 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { UserService } from './user.service';
+import { environment } from '../../environments/environment';
 
 describe('UserService', () => {
   let service: UserService;
   let httpMock: HttpTestingController;
+  const usersUrl = `${environment.apiUri}/api/v1/users`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -30,7 +32,7 @@ describe('UserService', () => {
       users = data;
     });
 
-    const req = httpMock.expectOne('http://localhost:3000/api/v1/users');
+    const req = httpMock.expectOne(usersUrl);
     expect(req.request.method).toBe('GET');
     req.flush([{ _id: '1', name: 'Dara' }]);
 
@@ -46,7 +48,7 @@ describe('UserService', () => {
       },
     });
 
-    const req = httpMock.expectOne('http://localhost:3000/api/v1/users/1');
+    const req = httpMock.expectOne(`${usersUrl}/1`);
     expect(req.request.method).toBe('DELETE');
     req.flush({}, { status: 403, statusText: 'Forbidden' });
 
@@ -62,7 +64,7 @@ describe('UserService', () => {
       },
     });
 
-    const req = httpMock.expectOne('http://localhost:3000/api/v1/users/1');
+    const req = httpMock.expectOne(`${usersUrl}/1`);
     req.error(new ProgressEvent('error'));
 
     expect(errorMessage).toBe('Something bad happened; please try again later.');

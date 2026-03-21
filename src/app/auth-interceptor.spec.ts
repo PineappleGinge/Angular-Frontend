@@ -4,8 +4,10 @@ import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { AuthInterceptor } from './auth-interceptor';
+import { environment } from '../environments/environment';
 
 describe('AuthInterceptor', () => {
+  const apiUri = environment.apiUri;
   const runInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn) =>
     TestBed.runInInjectionContext(() => AuthInterceptor(req, next));
 
@@ -18,7 +20,7 @@ describe('AuthInterceptor', () => {
 
   it('should attach bearer token to non-auth API requests', () => {
     localStorage.setItem('accessToken', 'abc.def.ghi');
-    const req = new HttpRequest('GET', 'http://localhost:3000/api/v1/cars');
+    const req = new HttpRequest('GET', `${apiUri}/api/v1/cars`);
     let capturedRequest: HttpRequest<unknown> | null = null;
 
     runInterceptor(req, (forwardedReq) => {
@@ -32,7 +34,7 @@ describe('AuthInterceptor', () => {
 
   it('should not attach token to auth endpoint requests', () => {
     localStorage.setItem('accessToken', 'abc.def.ghi');
-    const req = new HttpRequest('POST', 'http://localhost:3000/api/v1/auth', {});
+    const req = new HttpRequest('POST', `${apiUri}/api/v1/auth`, {});
     let capturedRequest: HttpRequest<unknown> | null = null;
 
     runInterceptor(req, (forwardedReq) => {
@@ -46,7 +48,7 @@ describe('AuthInterceptor', () => {
 
   it('should not attach malformed bearer token', () => {
     localStorage.setItem('accessToken', 'not-a-jwt');
-    const req = new HttpRequest('DELETE', 'http://localhost:3000/api/v1/cars/1');
+    const req = new HttpRequest('DELETE', `${apiUri}/api/v1/cars/1`);
     let capturedRequest: HttpRequest<unknown> | null = null;
 
     runInterceptor(req, (forwardedReq) => {
@@ -64,7 +66,7 @@ describe('AuthInterceptor', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
 
-    const req = new HttpRequest('GET', 'http://localhost:3000/api/v1/cars');
+    const req = new HttpRequest('GET', `${apiUri}/api/v1/cars`);
 
     runInterceptor(req, () =>
       throwError(() => new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' }))
@@ -81,7 +83,7 @@ describe('AuthInterceptor', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
 
-    const req = new HttpRequest('POST', 'http://localhost:3000/api/v1/cars', {});
+    const req = new HttpRequest('POST', `${apiUri}/api/v1/cars`, {});
 
     runInterceptor(req, () =>
       throwError(() => new HttpErrorResponse({ status: 403, statusText: 'Forbidden' }))
