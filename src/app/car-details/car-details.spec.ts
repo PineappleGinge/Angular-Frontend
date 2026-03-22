@@ -17,14 +17,17 @@ describe('CarDetails', () => {
   let fixture: ComponentFixture<CarDetails>;
   let carServiceSpy: jasmine.SpyObj<CarService>;
   let router: Router;
-  const authServiceStub = {
-    isAuthenticated$: new BehaviorSubject<boolean>(true),
-  };
+  let authServiceStub: { isAuthenticated$: BehaviorSubject<boolean> };
 
   beforeEach(async () => {
-    carServiceSpy = jasmine.createSpyObj<CarService>('CarService', ['getCarById', 'deleteCar']);
+    authServiceStub = {
+      isAuthenticated$: new BehaviorSubject<boolean>(true),
+    };
+
+    carServiceSpy = jasmine.createSpyObj<CarService>('CarService', ['getCarById', 'deleteCar', 'getVehicleValue']);
     carServiceSpy.getCarById.and.returnValue(of({ _id: '1', make: 'Ford', model: 'Mustang' } as any));
     carServiceSpy.deleteCar.and.returnValue(of(void 0));
+    carServiceSpy.getVehicleValue.and.returnValue(of({ value: 12000 } as any));
 
     await TestBed.configureTestingModule({
       imports: [CarDetails],
@@ -89,5 +92,51 @@ describe('CarDetails', () => {
     spyOn(component, 'deleteItem');
     component.openConfirmDeleteDialog();
     expect(component.deleteItem).toHaveBeenCalled();
+  });
+
+  it('should not toggle edit mode when unauthenticated', () => {
+    authServiceStub.isAuthenticated$.next(false);
+    component.isEditing = false;
+
+    component.toggleEdit();
+
+    expect(component.isEditing).toBeFalse();
+  });
+
+  it('should not delete when unauthenticated', () => {
+    authServiceStub.isAuthenticated$.next(false);
+    component.id = '1';
+
+    component.deleteItem();
+
+    expect(carServiceSpy.deleteCar).not.toHaveBeenCalled();
+  });
+
+  it('should show validation error when estimate value is requested with missing fields', () => {
+    component.estimateValue({ make: '', model: 'Focus', yearOfCar: 2020 } as any);
+
+    expect(component.vehicleValueResponse).toBeNull();
+    expect(component.hasRequestedVehicleValue).toBeTrue();
+    expect(component.vehicleValueError).toContain('required');
+  });
+
+  it('should request vehicle value and format numeric value', () => {
+    carServiceSpy.getVehicleValue.and.returnValue(of({ nested: { marketValue: '24500' } } as any));
+
+    component.estimateValue({ make: 'Ford', model: 'Focus', yearOfCar: '2020' as any } as any);
+
+    expect(carServiceSpy.getVehicleValue).toHaveBeenCalledWith('Ford', 'Focus', 2020);
+    expect(component.vehicleValueLoading).toBeFalse();
+    expect(component.vehicleValueError).toBeNull();
+    expect(component.displayVehicleValue).toContain('$24,500');
+  });
+
+  it('should set estimate error message when vehicle value request fails', () => {
+    carServiceSpy.getVehicleValue.and.returnValue(throwError(() => new Error('Estimator offline')));
+
+    component.estimateValue({ make: 'Ford', model: 'Focus', yearOfCar: 2020 } as any);
+
+    expect(component.vehicleValueLoading).toBeFalse();
+    expect(component.vehicleValueError).toBe('Estimator offline');
   });
 });
